@@ -46,7 +46,14 @@ public class Player : MonoBehaviour
         }
         else if(position == 1)
         {
+            if (gameObject.transform.position.x > 2)
+            {
 
+            }
+            else
+            {
+
+            }
         }
         
         
