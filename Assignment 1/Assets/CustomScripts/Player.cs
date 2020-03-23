@@ -1,50 +1,62 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class Player : DefaultTrackableEventHandler
+public class Player : MonoBehaviour
 {
     // Start is called before the first frame update
 
     public Animator anima;
     public bool aniplaying;
-    private GameObject target;
-    private Rigidbody rigid;
-    private int position;
-    Vector3 originPosition;
+    //private GameObject target;
+    //private Rigidbody rigid;
+    private int destIndex = 0;
     bool found = false;
 
+    public List<Transform> Destinations;
+
+    public DefaultTrackableEventHandler ScenarioImageTracker;
+    private Transform myTransform;
+    float moveSpeed = 0.1f;
 
     void Start()
     {
-        anima = GetComponent<Animator>();
-        target = GameObject.Find("Target");
-        rigid = GetComponent<Rigidbody>();
-        position = 0;
+        //anima = getcomponent<animator>();
+        //target = gameobject.find("target");
+        //rigid = getcomponent<rigidbody>();
+        //destIndex = 0;
+        myTransform = transform;
+        //Vector3 originPosition = transform.position;
+        ScenarioImageTracker.OnTargetFound.AddListener(TurnMoveToDestinationsOn);
+        ScenarioImageTracker.OnTargetLost.AddListener(TurnMoveToDestinationsOff);
         
-        Vector3 originPosition = transform.position;
-
     }
-
-    protected override void OnTrackingFound()
-    {
-        base.OnTrackingFound();
-        found = true;
-    }
-
-    protected override void OnTrackingLost()
-    {
-        base.OnTrackingLost();
-        found = false;
-
-    }
-
 
     // Update is called once per frame
     void Update()
     {
+        Debug.Log("Found: " + found);
+        Debug.Log("Position: " + destIndex);
+        Debug.Log("Count: " + Destinations.Count);
+        Debug.Log("Transform Position: " + transform.position);
+        if (found && destIndex < Destinations.Count)
+        {
+            var target = Destinations[destIndex];
+            Debug.Log("Target Position: " + target.position);
+            float step = moveSpeed * Time.deltaTime;
+
+            myTransform.position = Vector3.MoveTowards(myTransform.up, target.position, step);
+            //float distanceToPlane = Vector3.Dot(myTransform.up, target.position - myTransform.position);
+            //Vector3 pointOnPlane = target.position - (myTransform.up * distanceToPlane);
+
+            //myTransform.LookAt(pointOnPlane, myTransform.up);
+            aniplaying = true;
+        }
         
-        if(position == 0)
+
+
+        /*if(position == 0)
         {
             Debug.Log(gameObject.transform.position.z);
             if (gameObject.transform.position.z > -0.25)
@@ -113,7 +125,7 @@ public class Player : DefaultTrackableEventHandler
         }
         
         
-        
+        */
         
     }
 
@@ -130,5 +142,14 @@ public class Player : DefaultTrackableEventHandler
     }
 
 
+    public void TurnMoveToDestinationsOn()
+    {
+        found = true;
+    }
 
+    public void TurnMoveToDestinationsOff()
+    {
+        found = false;
+    }
 }
+
